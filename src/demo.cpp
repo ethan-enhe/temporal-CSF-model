@@ -1,6 +1,9 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
+#include "opencv2/core.hpp"
+#include "opencv2/core/mat.hpp"
+
 using namespace cv;
 using namespace std;
 bool show = true;
@@ -70,6 +73,39 @@ pair<cv::Mat, cv::Mat> temporalCsfModel(Mat I, Mat I2, int fr, int p) {
         cv::imshow("F_lum", F_lum / 2);
         cv::waitKey(0);
     }
+    F_lum *= 8;
+
+    // T_basic
+    float theta_xy = 2. * atan(1. / (2 * 3 * 768)); // this depend on the resolution
+    auto phi = [](int x) {
+        if (x == 0)
+            return sqrt(1. / 8);
+        else
+            return sqrt(2. / 8);
+    };
+    auto omega = [&](int x, int y) {
+        // cout<<theta_xy<<endl;
+        return sqrt(x * x + y * y) / 16 / theta_xy;
+    };
+    cv::Mat T_(8, 8, CV_32F);
+    float r = 0.6, s = 0.25;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            float omega_ij = omega(i, j);
+            float phi_ij = asin(2 * omega(i, 0) * omega(j, 0) / omega_ij / omega_ij);
+            float cos_phi_ij = cos(phi_ij);
+            T_.at<float>(i, j) = 1. / phi(i) / phi(j) * exp(0.18 * omega_ij) / (1.33 + 0.11 * omega_ij) /
+                                 (r + (1 - r) * cos_phi_ij * cos_phi_ij);
+            cout << omega_ij << endl;
+        }
+    }
+    T_ *= s;
+    cv::Mat T_basic = block_proc(F_lum0, CV_32F, {1, 1}, {8, 8}, [&](cv::Mat block) { return T_; });
+    if (show) {
+        cv::imshow("T", T_basic);
+        cv::waitKey(0);
+    }
+
     cv::Mat x, y;
     return {x, y};
 }
