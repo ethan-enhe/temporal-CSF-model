@@ -49,7 +49,7 @@ F_lum =  ones(size(F_lum0));
 
 for i = 1 : size(F_lum0,1)
     for j = 1: size(F_lum0,2)
-        if F_lum0(i,j) <= 60
+     dct2   if F_lum0(i,j) <= 60
             F_lum(i,j) = (60 - F_lum0(i,j))/150 +1;
         end
         if F_lum0(i,j) >= 170

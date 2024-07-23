@@ -13,7 +13,7 @@
 clc
 clear all
 
-vid = VideoReader('INSERT PATH TO VIDEO FILE HERE'); %insert path to video file here
+vid = VideoReader('./test.mp4'); %insert path to video file here
 
 inx = 1; %change to whichever frame number you are trying to calculate
 I = read(vid,inx); 

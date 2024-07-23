@@ -96,7 +96,7 @@ pair<cv::Mat, cv::Mat> temporalCsfModel(Mat I, Mat I2, int fr, int p) {
             float cos_phi_ij = cos(phi_ij);
             T_.at<float>(i, j) = 1. / phi(i) / phi(j) * exp(0.18 * omega_ij) / (1.33 + 0.11 * omega_ij) /
                                  (r + (1 - r) * cos_phi_ij * cos_phi_ij);
-            cout << omega_ij << endl;
+            cout << omega_ij*0.18 << endl;
         }
     }
     T_ *= s;
